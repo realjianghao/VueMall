@@ -31,6 +31,7 @@ export default {
   },
   methods: {
     itemClick(){
+      if(this.isActive) return
       this.$router.replace(this.path)
     }
   }

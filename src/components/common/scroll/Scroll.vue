@@ -28,13 +28,17 @@ export default {
   },
   methods: {
     scrollTo(x, y, time = 300) {
-      this.scroll.scrollTo(x, y, time)
+      this.scroll && this.scroll.scrollTo(x, y, time)
     },
-    refresh(){
+    refresh() {
+      // console.log('refresh');
       this.scroll && this.scroll.refresh()
     },
-    finishPullUp(){
-      this.scroll.finishPullUp()
+    finishPullUp() {
+      this.scroll && this.scroll.finishPullUp()
+    },
+    getCurrentY(){
+      return this.scroll? this.scroll.y: 0
     }
   },
   mounted() {
@@ -47,13 +51,9 @@ export default {
     this.scroll.on('scroll', position => {
       this.$emit('scroll', position)
     })
-    this.scroll.on('pullingUp', ()=>{
-      console.log('pullup');
+    this.scroll.on('pullingUp', () => {
       this.$emit('pullingUp')
-
     })
-
-
   }
 }
 </script>
