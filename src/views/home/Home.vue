@@ -4,7 +4,7 @@
       <div slot="center">购物街</div>
     </nav-bar>
 
-    <tab-control ref="tabControl1" :titles="['流行', '新款', '精选']" class="tab-control" @tabClick="tabClick"
+    <tab-control ref="topTabControl" :titles="['流行', '新款', '精选']" class="tab-control" @tabClick="tabClick"
                  v-show="isTabFixed"/>
 
     <scroll class='content' ref="scroll"
@@ -12,14 +12,14 @@
             @scroll="contentScroll"
             :pull-up-load="true"
             @pullingUp="loadMore">
-      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
+      <home-swiper :banners="banners" @imgLoad="swiperImgLoad"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
-      <tab-control ref="tabControl2" :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
+      <tab-control ref="tabControl" :titles="['流行', '新款', '精选']" @tabClick="tabClick"/>
       <goods-list :goodsList="showGoods"/>
     </scroll>
 
-    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <back-top @click.native="backTop" v-show="showBackTop"/>
   </div>
 </template>
 
@@ -36,7 +36,7 @@ import BackTop from "components/content/backTop/BackTop";
 
 import {getHomeMultidata, getHomeGoods} from "@/network/home";
 
-import {imgLoadMixin} from "common/mixin";
+import {imgLoadMixin, backTopMixin} from "common/mixin";
 
 export default {
   name: "Home",
@@ -50,7 +50,7 @@ export default {
     GoodsList,
     BackTop
   },
-  mixins: [imgLoadMixin],
+  mixins: [imgLoadMixin, backTopMixin],
   data() {
     return {
       banners: [],
@@ -61,7 +61,6 @@ export default {
         'sell': {page: 0, list: []}
       },
       currentType: 'pop',
-      isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0
@@ -103,21 +102,18 @@ export default {
           this.currentType = 'sell'
           break
       }
-      this.$refs.tabControl1.currentIndex = index
-      this.$refs.tabControl2.currentIndex = index
-    },
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0)
+      this.$refs.topTabControl.currentIndex = index
+      this.$refs.tabControl.currentIndex = index
     },
     contentScroll(position) {
-      this.isShowBackTop = (-position.y) > 1000
+      this.showBackTop = (-position.y) > 1000
       this.isTabFixed = (-position.y) > this.tabOffsetTop
     },
     loadMore() {
       this.getHomeGoods(this.currentType)
     },
-    swiperImageLoad() {
-      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
+    swiperImgLoad() {
+      this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop
     },
 
     getHomeMultidata() {
