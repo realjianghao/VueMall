@@ -118,9 +118,11 @@ export default {
       goods.imgURL = this.topImages[0]
       goods.title = this.goods.title
       goods.desc = this.goods.desc;
-      goods.newPrice = this.goods.realPrice;
+      goods.price = this.goods.realPrice;
       // 3.添加到Store中
-      this.$store.commit('addToCart', goods)
+      this.$store.dispatch('addToCart', goods).then(res => {
+        this.$toast.show(res, 2000)
+      })
     }
   }
 }

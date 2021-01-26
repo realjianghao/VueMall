@@ -1,129 +1,146 @@
 <template>
-  <div class="wrapper" ref="wrapper">
-    <ul>
-      <li>商品1</li>
-      <li>商品2</li>
-      <li>商品3</li>
-      <li>商品4</li>
-      <li>商品5</li>
-      <li>商品6</li>
-      <li>商品7</li>
-      <li>商品8</li>
-      <li>商品9</li>
-      <li>商品10</li>
-      <li>商品11</li>
-      <li>商品12</li>
-      <li>商品13</li>
-      <li>商品14</li>
-      <li>商品15</li>
-      <li>商品16</li>
-      <li>商品17</li>
-      <li>商品18</li>
-      <li>商品19</li>
-      <li>商品20</li>
-      <li>商品21</li>
-      <li>商品22</li>
-      <li>商品23</li>
-      <li>商品24</li>
-      <li>商品25</li>
-      <li>商品26</li>
-      <li>商品27</li>
-      <li>商品28</li>
-      <li>商品29</li>
-      <li>商品30</li>
-      <li>商品31</li>
-      <li>商品32</li>
-      <li>商品33</li>
-      <li>商品34</li>
-      <li>商品35</li>
-      <li>商品36</li>
-      <li>商品37</li>
-      <li>商品38</li>
-      <li>商品39</li>
-      <li>商品40</li>
-      <li>商品41</li>
-      <li>商品42</li>
-      <li>商品43</li>
-      <li>商品44</li>
-      <li>商品45</li>
-      <li>商品46</li>
-      <li>商品47</li>
-      <li>商品48</li>
-      <li>商品49</li>
-      <li>商品50</li>
-      <li>商品51</li>
-      <li>商品52</li>
-      <li>商品53</li>
-      <li>商品54</li>
-      <li>商品55</li>
-      <li>商品56</li>
-      <li>商品57</li>
-      <li>商品58</li>
-      <li>商品59</li>
-      <li>商品60</li>
-      <li>商品61</li>
-      <li>商品62</li>
-      <li>商品63</li>
-      <li>商品64</li>
-      <li>商品65</li>
-      <li>商品66</li>
-      <li>商品67</li>
-      <li>商品68</li>
-      <li>商品69</li>
-      <li>商品70</li>
-      <li>商品71</li>
-      <li>商品72</li>
-      <li>商品73</li>
-      <li>商品74</li>
-      <li>商品75</li>
-      <li>商品76</li>
-      <li>商品77</li>
-      <li>商品78</li>
-      <li>商品79</li>
-      <li>商品80</li>
-      <li>商品81</li>
-      <li>商品82</li>
-      <li>商品83</li>
-      <li>商品84</li>
-      <li>商品85</li>
-      <li>商品86</li>
-      <li>商品87</li>
-      <li>商品88</li>
-      <li>商品89</li>
-      <li>商品90</li>
-      <li>商品91</li>
-      <li>商品92</li>
-      <li>商品93</li>
-      <li>商品94</li>
-      <li>商品95</li>
-      <li>商品96</li>
-      <li>商品97</li>
-      <li>商品98</li>
-      <li>商品99</li>
-      <li>商品100</li>
-    </ul>
+  <div id="category">
+    <nav-bar class="nav-bar">
+      <div slot="center">商品分类</div>
+    </nav-bar>
+
+    <category-list :categories="categories" @selectCategory="selectCategory"/>
+
+    <scroll class="scroll-content" ref="scroll">
+      <category-content :subcategories="getSubcategories"/>
+      <tab-control :titles="['综合', '新品', '销量']" @tabClick="tabClick"/>
+      <category-content-detail :category-detail="getCategoryDetail"/>
+    </scroll>
+
+
   </div>
 </template>
 
 <script>
-import BScroll from 'better-scroll'
+import NavBar from "@/components/common/navbar/NavBar";
+import Scroll from "@/components/common/scroll/Scroll";
+
+import TabControl from "@/components/content/tabControl/TabControl";
+
+import CategoryList from "./childComps/CategoryList";
+import CategoryContent from "./childComps/CategoryContent";
+import CategoryContentDetail from "./childComps/CategoryContentDetail";
+
+import {getCategory, getCategoryDetail, getSubcategory} from "@/network/category";
+
+import {imgLoadMixin} from "@/common/mixin";
+
 export default {
   name: "Category",
-  data(){
+  components: {
+    NavBar,
+    Scroll,
+    TabControl,
+    CategoryList,
+    CategoryContent,
+    CategoryContentDetail
+  },
+  mixins: [imgLoadMixin],
+  data() {
     return {
-      scroll: null
+      categories: [],
+      categoryData: {},
+      currentIndex: -1,
+      detailType: 'pop'
     }
   },
-  mounted() {
-    this.scroll = new BScroll(this.$refs.wrapper)
+  computed: {
+    getSubcategories(){
+      if(this.currentIndex === -1) return {}
+      return this.categoryData[this.currentIndex].subcategories
+    },
+    getCategoryDetail(){
+      if(this.currentIndex === -1) return []
+      return this.categoryData[this.currentIndex].categoryDetail[this.detailType]
+    }
+  },
+  methods: {
+    _getCategory() {
+      getCategory().then(res => {
+        // 1.获取分类数据
+        this.categories = res.data.category.list
+        // 2.初始化每个类别的子数据
+        for (let i = 0; i < this.categories.length; i++) {
+          this.categoryData[i] = {
+            subcategories: {},
+            categoryDetail: {
+              'pop': [],
+              'new': [],
+              'sell': []
+            }
+          }
+        }
+        // 3.请求第一个分类的数据
+        this._getSubcategories(0)
+      })
+    },
+    _getSubcategories(index) {
+      this.currentIndex = index;
+      const mailKey = this.categories[index].maitKey;
+      getSubcategory(mailKey).then(res => {
+        this.categoryData[index].subcategories = res.data
+        this.categoryData = {...this.categoryData}
+        this._getCategoryDetail('pop')
+        this._getCategoryDetail('sell')
+        this._getCategoryDetail('new')
+      })
+    },
+    _getCategoryDetail(type) {
+      // 1.获取请求的miniWallkey
+      const miniWallkey = this.categories[this.currentIndex].miniWallkey;
+      // 2.发送请求,传入miniWallkey和type
+      getCategoryDetail(miniWallkey, type).then(res => {
+        // 3.将获取的数据保存下来
+        this.categoryData[this.currentIndex].categoryDetail[type] = res
+        this.categoryData = {...this.categoryData}
+      })
+    },
+
+    selectCategory(index) {
+      this._getSubcategories(index)
+    },
+
+    tabClick(index) {
+      this.detailType = {
+        0: 'pop',
+        1: 'new',
+        2: 'sell'
+      }[index]
+    }
+  },
+  created() {
+    this._getCategory()
   }
 }
 </script>
 
 <style scoped>
-.wrapper{
-  height: 200px;
-  background-color: red;
+#category {
+  height: calc(100vh - 49px);
+
+  position: relative;
+}
+
+.nav-bar {
+  background-color: var(--color-tint);
+  font-weight: 700;
+  color: #fff;
+}
+
+
+.scroll-content {
+  position: absolute;
+  top: 44px;
+  left: 100px;
+  right: 0;
+  bottom: 0;
+
+
   overflow: hidden;
 }
 </style>

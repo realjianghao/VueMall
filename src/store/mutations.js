@@ -1,13 +1,16 @@
-const mutations = {
+export default {
   addToCart(state, goods) {
-    const oldGoods = state.cartList.find(item => item.iid === goods.iid)
-    if(oldGoods){
-      oldGoods.count++
-    }else{
+      goods.checked = true
       goods.count = 1
       state.cartList.push(goods)
-    }
+  },
+  addCount(state, goods){
+    goods.count++
+  },
+  checkAll(state){
+    state.cartList.forEach(item => item.checked = true)
+  },
+  uncheckAll(state){
+    state.cartList.forEach(item => item.checked = false)
   }
 }
-
-export default mutations

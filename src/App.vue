@@ -5,15 +5,21 @@
     </keep-alive>
 
     <main-tab-bar></main-tab-bar>
+    <icon/>
+    <svg-icon/>
   </div>
 </template>
 
 <script>
 import MainTabBar from "@/components/content/mainTabBar/MainTabBar";
+import Icon from "@/components/content/icon/Icon";
+import SvgIcon from "@/components/content/icon/Svg";
 export default {
   name: 'App',
   components: {
-    MainTabBar
+    MainTabBar,
+    Icon,
+    SvgIcon
   }
 }
 </script>

@@ -72,13 +72,14 @@ export default {
     }
   },
   created() {
+    this.checkViewport()
     this.getHomeMultidata()
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
   },
   mounted() {
-    // console.log('mounted');
+    // this.checkViewport()
   },
   activated() {
     // console.log('activated');
@@ -129,6 +130,14 @@ export default {
         this.goods[type].page++
         this.$refs.scroll.finishPullUp()
       })
+    },
+    checkViewport(){
+      const width = document.documentElement.clientWidth
+      const height = document.documentElement.clientHeight
+      if(width !== 375 || height !== 667){
+        // alert('建议切换移动端视图，选择iPhone6/7/8 375×667，并刷新')
+        this.$toast.show('建议切换移动端视图，选择iPhone6/7/8 375×667，并刷新', 5000)
+      }
     }
   }
 }

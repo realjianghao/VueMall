@@ -22,7 +22,7 @@ export default {
   },
   computed: {
     getImg(){
-      return this.goods.image || this.goods.show.img
+      return this.goods.img || this.goods.image || this.goods.show.img
     }
   },
   methods: {
