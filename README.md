@@ -1,4 +1,4 @@
-# mall
+# VueMall
 
 ## Project setup
 ```
