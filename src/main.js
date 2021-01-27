@@ -4,8 +4,13 @@ import router from './router'
 import store from "./store";
 import Toast from "@/components/common/toast";
 import FastClick from 'fastclick'
+import VueLazyload from "vue-lazyload";
 
 Vue.use(Toast)
+Vue.use(VueLazyload,{
+  preLoad: 1,
+  loading: require('./assets/img/common/placeholder.jpg')
+})
 
 FastClick.attach(document.body)
 
